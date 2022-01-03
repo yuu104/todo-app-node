@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToDoリスト</title>
+  <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main>
+    <h1 class="main_title">ToDo</h1>
+    <div class="flexbox_1">
+      <div class="todo_box">
+        <form action="/create" id="todo_form" name="todo_form" method="POST" onsubmit="return false;">
+          <input type="text" name="taskName" id="add" placeholder="タスクを入力してください">
+          <div class="sub_inp">
+            <div class="priority">
+              <a class="priority_icon">
+                <i class="fas fa-list-ol"></i>
+              </a>
+              <div class="priority_dialog">
+                <p>優先度</p>
+                <ul class="priority_box">
+                  <li class="priority_li_1">
+                    <input type="radio" name="priority" value="a_high" id="priority_inp_1">
+                    <label for="priority_inp_1" class="priority_label">
+                      <span style="color:#e13e39">!!!</span>High
+                    </label>
+                  </li>
+                  <li class="priority_li_2">
+                    <input type="radio" name="priority" value="b_medium" id="priority_inp_2">
+                    <label for="priority_inp_2" class="priority_label">
+                      <span style="color:#ffc817">!!</span>Medium
+                    </label>
+                  </li>
+                  <li class="priority_li_3">
+                    <input type="radio" name="priority" value="c_low" id="priority_inp_3">
+                    <label for="priority_inp_3" class="priority_label">
+                      <span style="color:#4b6fde"> !</span>Low
+                    </label>
+                  </li>
+                  <li class="priority_li_4">
+                    <input type="radio" name="priority" value="d_none" id="priority_inp_4" checked>
+                    <label for="priority_inp_4" class="priority_label">
+                      <span style="color:#dcdcdc">!!!</span>none
+                    </label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <a href="javascript:void(0)" class="send send_task">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </a>
+          </div>
+        </form>
+
+        <div class="tasks">
+          <p class="task_title title">タスク</p>
+          <ul id="task_ul" class="todo_ul">
+            <% let i = 0; %>
+            <% doItems.forEach(item => { %>
+                <li class="task_li">
+                  <form action="/comped/<%= item.id %>" method="post" name="comped" class="checkbox_container <%= item.priority %> checkbox_container_task">
+                    <a href="#" onclick="this.parentNode.submit()" class="checkbox"></a>
+                  </form>
+                  <div class="todo_ul_contents">
+                    <span><%= item.task %></span>
+                    <div class="edit">
+                      <a class="edit_btn" id="<%= `editBtn_${i}` %>">
+                        <i class="far fa-edit"></i>
+                      </a>
+                      <form action="/renew/<%= item.id %>" class="edit_box" name="renew_form" onsubmit="return false;" method="POST">
+                        <input type="text" name="editTaskName" value="<%= item.task %>" class="edit_task_inp">
+                        <p class="edit_priority_title">優先度</p>                   
+                        <ul class="edit_priority_ul">
+                          <li class="edit_priority_li">
+                            <input type="radio" name="editPriority" class="edit_priority_inp" value="a_high" id="<%= `edit_high_${i}` %>" <% if(item.priority === 'a_high'){ %> checked <% } %>>
+                            <label for="<%= `edit_high_${i}` %>" class="edit_priority_label" style="color:#e13e39">!!!</label>  
+                          </li>
+                          <li class="edit_priority_li">
+                            <input type="radio" name="editPriority" class="edit_priority_inp" value="b_medium" id="<%= `edit_medium_${i}` %>" <% if(item.priority === 'b_medium'){ %> checked <% } %>>
+                            <label for="<%= `edit_medium_${i}` %>" class="edit_priority_label" style="color:#ffc817">!!</label> 
+                          </li>
+                          <li class="edit_priority_li">
+                            <input type="radio" name="editPriority" class="edit_priority_inp" value="c_low" id="<%= `edit_low_${i}` %>" <% if(item.priority === 'c_low'){ %> checked <% } %>>
+                            <label for="<%= `edit_low_${i}` %>" class="edit_priority_label" style="color:#4b6fde">!</label>
+                          </li>
+                          <li class="edit_priority_li">
+                            <input type="radio" name="editPriority" class="edit_priority_inp" value="d_low" id="<%= `edit_none_${i}` %>" <% if(item.priority === 'd_none'){ %> checked <% } %>>
+                            <label for="<%= `edit_none_${i}` %>" class="edit_priority_label" style="color:#dcdcdc">!!!</label>
+                          </li>
+                        </ul>
+                        <a href="#" onclick="this.parentNode.submit()">更新</a>
+                      </form>
+                    </div>
+                    <form action="/delete/<%= item.id %>" method="POST" class="delete">
+                      <a href="#" onclick="this.parentNode.submit()" class="delete_btn">
+                        <i class="far fa-trash-alt"></i>
+                      </a>
+                    </form>
+                  </div>
+                </li>
+                <% i++; %>
+            <% }); %>
+          </ul>
+        </div>
+
+        <div class="comps">
+          <p class="comp_title title">完了</p>
+          <ul id="comp_ul" class="todo_ul">
+            <% compedItems.forEach(item=> { %>
+              <li class="task_li">
+                <form action="/reCreate/<%= item.id %>" method="POST" name="reCreate" class="checkbox_container checked_container">
+                  <a href="#" onclick="this.parentNode.submit()" class="checkbox checked"></a>
+                </form>
+                <div class="todo_ul_contents">
+                  <span class="comped_task_name">
+                    <%= item.task %>
+                  </span>
+                </div>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sub_item">
+        <div class="cont_plan">
+          <div class="cont_plan_title">
+            <h3>偶然性プランニング</h3>
+            <div class="question_icon_box">
+              <i class="far fa-question-circle question_btn"></i>
+            </div>
+          </div>
+          <form action="/planing" method="POST" class="cont_plan_form">
+            <div class="cp_iptxt">
+	            <input class="ef" type="text" name="estimate" required>
+	            <label>予測</label>
+	            <span class="focus_line"></span>
+            </div>
+            <div class="cp_iptxt cp_iptxt_measure">
+	            <input class="ef" type="text" name="measure" required>
+	            <label>対策</label>
+	            <span class="focus_line"></span>
+            </div>
+            <a href="javascript:void(0)" class="send send_cont_plan">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </a>
+          </form>
+          <ul class="cont_plan_ul">
+            <% contPlans.forEach(contPlan => { %>
+                <li class="cont_plan_li">
+                  <p class="cont_plan_text estimate_text"><%= contPlan.estimate %></p>
+                  <p class="cont_plan_text measure_text">
+                    <span>→</span>
+                    <%= contPlan.measure %>
+                  </p>
+                  <form action="/contPlanDelete/<%= contPlan.id %>" method="POST" class="cont_plan_delete">
+                    <a href="#" onclick="this.parentNode.submit()">
+                      <i class="far fa-trash-alt"></i>
+                    </a>
+                  </form>
+                </li>
+            <% }) %>
+          </ul>
+          <div id="modal_mask" class="hidden"></div>
+          <div id="modal_contents" class="hidden">
+            <div class="modal_close">
+              <i class="fas fa-times"></i>
+            </div>
+            <h2>偶然性プランニングとは？</h2>
+            <p class="modal_contents_desc">
+              偶然性プランニングとは、あらかじめ作業の邪魔が入る予測をしておくことで作業の生産性と集中力を高める方法です。
+              <br>あなたのToDoを妨げる事柄を予測し、その対策を立てましょう！
+            </p>
+            <p class="example">例</p>
+            <ul class="modal_contents_ul">
+              <li>
+                <p>スマホに気を取られてしまう</p>
+                <p>→電源をoffにする</p>
+              </li>
+              <li>
+                <p>電話やメールの対応に追われる</p>
+                <p>→返信する時間帯を決めておく</p>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <table cellpadding="10">
+        <tr align="left">
+          <th>タスク総数</th>
+          <td><%= countTotal %>個</td>
+        </tr>
+        <tr align="left">
+          <th>残りのタスク数</th>
+          <td><%= countTask %>個</td>
+        </tr>
+        <tr align="left">
+          <th>完了済みタスク数</th>
+          <td><%= countComped %>個</td>
+        </tr>
+        <tr align="left">
+          <th>タスク完遂率</th>
+          <td><%= (countComped/countTotal)*100 %>％</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+</body>
+</html>
